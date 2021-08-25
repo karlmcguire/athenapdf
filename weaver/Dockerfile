@@ -9,18 +9,17 @@ RUN apk add --update git
 # RUN dep ensure --vendor-only -v
 
 COPY . ./
-RUN go build -v -o build/weaver .
-
-ENV GIN_MODE release
+RUN go build -v -o weaver .
 
 # Dont need dumb-init
+# ENV GIN_MODE release
 # RUN \
 #   wget https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
 #   && dpkg -i dumb-init_*.deb \
 #   && rm dumb-init_*.deb \
 #   && mkdir -p /athenapdf-service/tmp/
 
-COPY build/weaver /athenapdf-service/
+COPY weaver /athenapdf-service/
 WORKDIR /athenapdf-service/
 
 ENV PATH /athenapdf-service/:$PATH
