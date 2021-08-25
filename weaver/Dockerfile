@@ -2,18 +2,18 @@ FROM golang:1.16-alpine
 WORKDIR /go/src/github.com/lachee/athenapdf/weaver
 
 RUN apk add --update git
-RUN go get -u github.com/golang/dep/cmd/dep
 
-COPY Gopkg.lock Gopkg.toml ./
-RUN dep ensure --vendor-only -v
+# Go-Dep is deprecated
+# RUN go get -u github.com/golang/dep/cmd/dep
+# COPY Gopkg.lock Gopkg.toml ./
+# RUN dep ensure --vendor-only -v
 
 COPY . ./
-
-RUN \
-  CGO_ENABLED=0 go build -v -o weaver .
+RUN go build -v -o weaver .
 
 ENV GIN_MODE release
 
+# Dont need dumb-init
 # RUN \
 #   wget https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
 #   && dpkg -i dumb-init_*.deb \
