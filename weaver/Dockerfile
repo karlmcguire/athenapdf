@@ -1,4 +1,5 @@
-FROM golang:1.16-alpine
+# ==== Building
+FROM golang:1.16-alpine AS build
 WORKDIR /go/src/github.com/lachee/athenapdf/weaver
 
 RUN apk add --update git
@@ -11,23 +12,30 @@ RUN apk add --update git
 COPY . ./
 RUN go build -v -o weaver .
 
-# Dont need dumb-init
-# ENV GIN_MODE release
-# RUN \
-#   wget https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
-#   && dpkg -i dumb-init_*.deb \
-#   && rm dumb-init_*.deb \
-#   && mkdir -p /athenapdf-service/tmp/
+  
+# ==== Running
+FROM arachnysdocker/athenapdf AS run
 
-COPY weaver /athenapdf-service/
+# Setup dumb-init
+ENV GIN_MODE release
+RUN \
+  wget https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
+  && dpkg -i dumb-init_*.deb \
+  && rm dumb-init_*.deb \
+  && mkdir -p /athenapdf-service/tmp/
+
+# Copy the items across
+COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/weaver /athenapdf-service/weaver
+COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/conf/ /athenapdf-service/conf/
+
 WORKDIR /athenapdf-service/
 
+# Setup path
 ENV PATH /athenapdf-service/:$PATH
 
-COPY conf/ /athenapdf-service/conf/
-
+# Expose
 EXPOSE 8080
 
-CMD ["weaver"]
+CMD ["dumb-init", "weaver"]
 
-ENTRYPOINT ["sh", "/athenapdf-service/conf/entrypoint.sh"]
+ENTRYPOINT ["/athenapdf-service/conf/entrypoint.sh"]
