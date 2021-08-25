@@ -69,13 +69,6 @@ func conversionHandler(c *gin.Context, source converter.ConversionSource) {
 		c.Query("s3_acl"),
 	}
 
-	orientation := c.Query("orientation")
-	if orientation == "Landscape" {
-		orientation = " -O Landscape"
-	} else {
-		orientation = ""
-	}
-
 	var conversion converter.Converter
 	var work converter.Work
 	attempts := 0
@@ -84,7 +77,7 @@ func conversionHandler(c *gin.Context, source converter.ConversionSource) {
 	uploadConversion := converter.UploadConversion{baseConversion, awsConf}
 
 StartConversion:
-	conversion = athenapdf.AthenaPDF{uploadConversion, conf.AthenaCMD + orientation, aggressive, waitForStatus, noPortrait, pageSize}
+	conversion = athenapdf.AthenaPDF{uploadConversion, conf.AthenaCMD, aggressive, waitForStatus, noPortrait, pageSize}
 	if attempts != 0 {
 		cc := cloudconvert.Client{
 			conf.CloudConvert.APIUrl,
