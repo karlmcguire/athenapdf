@@ -1,18 +1,16 @@
 # ==== Building
-FROM golang:1.16-alpine AS build
-WORKDIR /go/src/github.com/lachee/athenapdf/weaver
-
-RUN apk add --update git
+FROM golang:1.16 AS build
+WORKDIR /go/src/github.com/lachee/athenapdf/weaver/
 
 # Go-Dep is deprecated
+# RUN apk add --update git
 # RUN go get -u github.com/golang/dep/cmd/dep
 # COPY Gopkg.lock Gopkg.toml ./
 # RUN dep ensure --vendor-only -v
 
 COPY . ./
-RUN go build -v -o weaver .
+RUN go build -v -o build/weaver .
 
-  
 # ==== Running
 FROM arachnysdocker/athenapdf AS run
 
@@ -24,18 +22,27 @@ RUN \
   && rm dumb-init_*.deb \
   && mkdir -p /athenapdf-service/tmp/
 
-# Copy the items across
-COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/weaver /athenapdf-service/weaver
-COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/conf/ /athenapdf-service/conf/
+RUN apt-get update -y \
+  && apt-get -y --force-yes install xvfb \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-WORKDIR /athenapdf-service/
+# WORKDIR /athenapdf-service
+
+# Copy the items across
+COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/build/ ./
+COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/conf/ ./conf/
+
 
 # Setup path
-ENV PATH /athenapdf-service/:$PATH
+# ENV PATH /athenapdf-service/:$PATH
 
 # Expose
 EXPOSE 8080
 
-CMD ["dumb-init", "weaver"]
+CMD [ "./weaver" ]
+ENTRYPOINT ["./conf/entrypoint.sh"]
 
-ENTRYPOINT ["/athenapdf-service/conf/entrypoint.sh"]
+#CMD [ "./weaver" ]
+#ENTRYPOINT [ "sh", "./conf/entrypoint.sh"]
+#ENTRYPOINT [ "sh", "weaver" ]
+
