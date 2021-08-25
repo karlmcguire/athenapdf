@@ -14,8 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
+	"github.com/satori/go.uuid"
 	"github.com/lachee/athenapdf/weaver/converter"
 )
 
