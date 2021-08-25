@@ -1,10 +1,11 @@
 package athenapdf
 
 import (
-	"github.com/arachnys/athenapdf/weaver/converter"
-	"github.com/arachnys/athenapdf/weaver/gcmd"
 	"log"
 	"strings"
+
+	"github.com/arachnys/athenapdf/weaver/converter"
+	"github.com/arachnys/athenapdf/weaver/gcmd"
 )
 
 // AthenaPDF represents a conversion job for athenapdf CLI.
@@ -24,6 +25,11 @@ type AthenaPDF struct {
 	Aggressive bool
 	// WaitForStatus will wait until window.status === WINDOW_STATUS
 	WaitForStatus bool
+	// NoPortrait will set the output PDF to be in landscape instead of in
+	// portrait orientation
+	NoPortrait bool
+	// Sets the page size for the PDF
+	PageSize string
 }
 
 // constructCMD returns a string array containing the AthenaPDF command to be
@@ -31,7 +37,7 @@ type AthenaPDF struct {
 // string.
 // It will set an additional '-A' flag if aggressive is set to true.
 // See athenapdf CLI for more information regarding the aggressive mode.
-func constructCMD(base string, path string, aggressive bool, waitForStatus bool) []string {
+func constructCMD(base string, path string, aggressive bool, waitForStatus bool, noPortrait bool, pageSize string) []string {
 	args := strings.Fields(base)
 	args = append(args, path)
 	if aggressive {
@@ -39,6 +45,12 @@ func constructCMD(base string, path string, aggressive bool, waitForStatus bool)
 	}
 	if waitForStatus {
 		args = append(args, "--wait-for-status")
+	}
+	if noPortrait {
+		args = append(args, "--no-portrait")
+	}
+	if len(pageSize) > 0 {
+		args = append(args, "-P", pageSize)
 	}
 	return args
 }
@@ -50,7 +62,7 @@ func (c AthenaPDF) Convert(s converter.ConversionSource, done <-chan struct{}) (
 	log.Printf("[AthenaPDF] converting to PDF: %s\n", s.GetActualURI())
 
 	// Construct the command to execute
-	cmd := constructCMD(c.CMD, s.URI, c.Aggressive, c.WaitForStatus)
+	cmd := constructCMD(c.CMD, s.URI, c.Aggressive, c.WaitForStatus, c.NoPortrait, c.PageSize)
 
 	log.Printf("[AthenaPDF] executing: %s\n", cmd)
 
