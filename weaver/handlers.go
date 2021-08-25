@@ -8,12 +8,12 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/arachnys/athenapdf/weaver/converter"
-	"github.com/arachnys/athenapdf/weaver/converter/athenapdf"
-	"github.com/arachnys/athenapdf/weaver/converter/cloudconvert"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/getsentry/raven-go"
 	"github.com/gin-gonic/gin"
+	"github.com/lachee/athenapdf/weaver/converter"
+	"github.com/lachee/athenapdf/weaver/converter/athenapdf"
+	"github.com/lachee/athenapdf/weaver/converter/cloudconvert"
 	"gopkg.in/alexcesaro/statsd.v2"
 )
 

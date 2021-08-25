@@ -2,12 +2,13 @@ package main
 
 import (
 	"errors"
-	"github.com/arachnys/athenapdf/weaver/converter"
-	"github.com/getsentry/raven-go"
-	"github.com/gin-gonic/gin"
-	"gopkg.in/alexcesaro/statsd.v2"
 	"log"
 	"net/http"
+
+	"github.com/getsentry/raven-go"
+	"github.com/gin-gonic/gin"
+	"github.com/lachee/athenapdf/weaver/converter"
+	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 var (

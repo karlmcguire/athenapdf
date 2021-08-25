@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/arachnys/athenapdf/weaver/converter"
-	"github.com/arachnys/athenapdf/weaver/testutil"
+	"github.com/lachee/athenapdf/weaver/converter"
+	"github.com/lachee/athenapdf/weaver/testutil"
 )
 
 func TestConstructCMD(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/arachnys/athenapdf/weaver/converter"
-	"github.com/arachnys/athenapdf/weaver/gcmd"
+	"github.com/lachee/athenapdf/weaver/converter"
+	"github.com/lachee/athenapdf/weaver/gcmd"
 )
 
 // AthenaPDF represents a conversion job for athenapdf CLI.
