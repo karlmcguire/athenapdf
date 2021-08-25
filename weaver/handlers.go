@@ -2,6 +2,12 @@ package main
 
 import (
 	"errors"
+	"log"
+	"net/http"
+	"os"
+	"runtime"
+	"time"
+
 	"github.com/arachnys/athenapdf/weaver/converter"
 	"github.com/arachnys/athenapdf/weaver/converter/athenapdf"
 	"github.com/arachnys/athenapdf/weaver/converter/cloudconvert"
@@ -9,11 +15,6 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/alexcesaro/statsd.v2"
-	"log"
-	"net/http"
-	"os"
-	"runtime"
-	"time"
 )
 
 var (
@@ -66,6 +67,13 @@ func conversionHandler(c *gin.Context, source converter.ConversionSource) {
 		c.Query("s3_acl"),
 	}
 
+	orientation := c.Query("orientation")
+	if orientation == "Landscape" {
+		orientation = " -O Landscape"
+	} else {
+		orientation = ""
+	}
+
 	var conversion converter.Converter
 	var work converter.Work
 	attempts := 0
@@ -74,7 +82,7 @@ func conversionHandler(c *gin.Context, source converter.ConversionSource) {
 	uploadConversion := converter.UploadConversion{baseConversion, awsConf}
 
 StartConversion:
-	conversion = athenapdf.AthenaPDF{uploadConversion, conf.AthenaCMD, aggressive, waitForStatus}
+	conversion = athenapdf.AthenaPDF{uploadConversion, conf.AthenaCMD + orientation, aggressive, waitForStatus}
 	if attempts != 0 {
 		cc := cloudconvert.Client{
 			conf.CloudConvert.APIUrl,
