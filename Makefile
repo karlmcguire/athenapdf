@@ -3,7 +3,7 @@ CLI_IMAGE ?= "arachnysdocker/athenapdf"
 CLI_DOCKER_ARTIFACT_DIR ?= "/athenapdf/build/"
 
 SERVICE_DIR ?= weaver
-SERVICE_IMAGE ?= "arachnysdocker/athenapdf-service"
+SERVICE_IMAGE ?= "lachee/athenapdf-service"
 SERVICE_DOCKER_ARTIFACT_FILE ?= "/go/src/github.com/lachee/athenapdf/weaver"
 
 P="\\033[34m[+]\\033[0m"
@@ -20,6 +20,7 @@ help:
 buildcli:
 	@echo "  $(P) buildcli"
 	@rm -rf $(CLI_DIR)/build/
+	@mkdir $(CLI_DIR)/build/
 	@docker build --rm -t $(CLI_IMAGE)-build -f $(CLI_DIR)/Dockerfile.build $(CLI_DIR)/
 	@docker run -t $(CLI_IMAGE)-build /bin/true
 	@docker cp `docker ps -q -n=1`:$(CLI_DOCKER_ARTIFACT_DIR) $(CLI_DIR)/build/
@@ -35,6 +36,7 @@ testcli:
 buildservice:
 	@echo "  $(P) buildservice"
 	@rm -rf $(SERVICE_DIR)/build/
+	@mkdir $(SERVICE_DIR)/build/
 	@docker build --rm -t $(SERVICE_IMAGE)-build -f $(SERVICE_DIR)/Dockerfile.build $(SERVICE_DIR)/
 	@docker run -t $(SERVICE_IMAGE)-build /bin/true
 	@docker cp `docker ps -q -n=1`:$(SERVICE_DOCKER_ARTIFACT_FILE) $(SERVICE_DIR)/build/

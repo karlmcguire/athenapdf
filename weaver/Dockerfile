@@ -9,7 +9,7 @@ RUN apk add --update git
 # RUN dep ensure --vendor-only -v
 
 COPY . ./
-RUN go build -v -o weaver .
+RUN go build -v -o build/weaver .
 
 ENV GIN_MODE release
 
