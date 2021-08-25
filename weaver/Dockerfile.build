@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine
+FROM golang:1.16-alpine
 WORKDIR /go/src/github.com/lachee/athenapdf/weaver
 
 RUN apk add --update git
