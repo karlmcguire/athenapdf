@@ -30,4 +30,4 @@ EXPOSE 8080
 
 CMD ["weaver"]
 
-ENTRYPOINT ["/athenapdf-service/conf/entrypoint.sh"]
+ENTRYPOINT ["sh", "/athenapdf-service/conf/entrypoint.sh"]
