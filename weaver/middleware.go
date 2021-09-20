@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"errors"
 	"log"
 	"net/http"
@@ -14,6 +16,10 @@ import (
 var (
 	// ErrAuthorization should be returned when the authorization key is invalid.
 	ErrAuthorization = errors.New("invalid authorization key provided")
+	// ErrParams should be returned when there is missing parameters
+	ErrParams = errors.New("missing or invalid query parameters")
+	// ErrSignature should be returned when the HMAC computed does not match the one given
+	ErrSignature = errors.New("invalid signature")
 	// ErrInternalServer should be returned when a private error is returned
 	// from a handler.
 	ErrInternalServer = errors.New("PDF conversion failed due to an internal server error")
@@ -87,6 +93,39 @@ func AuthorizationMiddleware(k string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Query("auth") != k {
 			c.AbortWithError(http.StatusUnauthorized, ErrAuthorization).SetType(gin.ErrorTypePublic)
+		}
+
+		c.Next()
+	}
+}
+
+// SignedMiddleware is a simple HMAC signing middleware which ensures the signed url (passed in the HMAC query)
+// is correct and matches the key we have. Use this instead of AuthorizationMiddleware to abstract the key away an extra layer
+// and make it unqiue per request.
+func SignedMiddleware(k []byte) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		// Fetch URL
+		url := c.Query("url")
+		if url == "" {
+			c.AbortWithError(http.StatusUnauthorized, ErrParams).SetType(gin.ErrorTypePublic)
+		} else {
+			// Fetch HMAC
+			receivedMAC := c.Query("hmac")
+			if receivedMAC == "" {
+				c.AbortWithError(http.StatusUnauthorized, ErrParams).SetType(gin.ErrorTypePublic)
+			} else {
+
+				// Verify the HMAC matches the URL using the key
+				mac := hmac.New(sha256.New, k)
+				expectedMAC := mac.Sum([]byte(url))
+				matches := hmac.Equal([]byte(receivedMAC), expectedMAC)
+				if !matches {
+
+					// Abort, invalid hmac
+					c.AbortWithError(http.StatusUnauthorized, ErrSignature).SetType(gin.ErrorTypePublic)
+				}
+			}
 		}
 
 		c.Next()

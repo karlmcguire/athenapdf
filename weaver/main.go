@@ -67,9 +67,16 @@ func InitMiddleware(router *gin.Engine, conf Config) {
 // to restrict access via an auth key (defined in the environment config).
 func InitSecureRoutes(router *gin.Engine, conf Config) {
 	authorized := router.Group("/")
-	authorized.Use(AuthorizationMiddleware(conf.AuthKey))
+
+	// AuthorizationMiddleware disabled, using SignedMiddleware instead
+	//authorized.Use(AuthorizationMiddleware(conf.AuthKey))
+	authorized.Use(SignedMiddleware([]byte(conf.AuthKey)))
+
+	// URL mode
 	authorized.GET("/convert", convertByURLHandler)
-	authorized.POST("/convert", convertByFileHandler)
+
+	// Uploads are disabled
+	//authorized.POST("/convert", convertByFileHandler)
 }
 
 // InitSimpleRoutes creates non-essential routes for monitoring and/or
