@@ -1,3 +1,4 @@
+# Ignore junk
 build/
 logs
 *.log
@@ -6,4 +7,7 @@ node_modules
 .npm
 .DS_STORE
 *.env
+
+# Ignore weaver enviroment variable used for testing, but not the sample env
+weaver.env
 !sample.env
