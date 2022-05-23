@@ -1,14 +1,8 @@
 # ==== Building
 FROM golang:1.16 AS build
-WORKDIR /go/src/github.com/lachee/athenapdf/weaver/
+WORKDIR /go/src/salucro-weaver
 
-# Go-Dep is deprecated
-# RUN apk add --update git
-# RUN go get -u github.com/golang/dep/cmd/dep
-# COPY Gopkg.lock Gopkg.toml ./
-# RUN dep ensure --vendor-only -v
-
-COPY . ./
+COPY . .
 RUN go build -v -o build/weaver .
 
 # ==== Running
@@ -29,8 +23,8 @@ RUN apt-get update -y \
 # WORKDIR /athenapdf-service
 
 # Copy the items across
-COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/build/ ./
-COPY --from=build /go/src/github.com/lachee/athenapdf/weaver/conf/ ./conf/
+COPY --from=build /go/src/salucro-weaver/build/ ./
+COPY --from=build /go/src/salucro-weaver/conf/ ./conf/
 
 
 # Setup path
