@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net/http"
 	"os"
@@ -110,7 +111,25 @@ func main() {
 		}
 
 		go func() {
-			log.Fatal(router.RunTLS(conf.HTTPSAddr, conf.TLSCertFile, conf.TLSKeyFile))
+			srv := &http.Server{
+				Addr:    conf.HTTPSAddr,
+				Handler: router,
+			}
+			srv.TLSConfig = &tls.Config{
+				PreferServerCipherSuites: true,
+				MinVersion:               tls.VersionTLS12,
+				CipherSuites: []uint16{
+					tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+					tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+					tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
+					tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+					tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+					tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+					tls.TLS_RSA_WITH_AES_128_CBC_SHA,
+					tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+				},
+			}
+			log.Fatal(srv.ListenAndServeTLS(conf.TLSCertFile, conf.TLSKeyFile))
 		}()
 	}
 
