@@ -1,6 +1,15 @@
-static:
-  image: salucro/athenapdf-service
-  ports:
-    - "8080:8080"
-  env_file:
-    - ./conf/sample.env
+version: '3'
+
+services:
+  static:
+    image: salucro-weaaver-build:testing
+    build: .
+    ports:
+      - 8000:8000
+      - 8888:8888
+    environment:
+      - GIN_MODE=debug
+      - WEAVER_HTTP_ADDR=:8000
+      - WEAVER_HTTPS_ADDR=:8888
+      - WEAVER_TLS_CERT_FILE=./conf/salucro.localhost.crt
+      - WEAVER_TLS_KEY_FILE=./conf/salucro.localhost.key

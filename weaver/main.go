@@ -131,16 +131,17 @@ func main() {
 			}
 			log.Fatal(srv.ListenAndServeTLS(conf.TLSCertFile, conf.TLSKeyFile))
 		}()
-	}
+	} else {
+		// fallback to http server if no https config
+		server := &http.Server{
+			Addr:    conf.HTTPAddr,
+			Handler: router,
+		}
 
-	server := &http.Server{
-		Addr:    conf.HTTPAddr,
-		Handler: router,
+		go func() {
+			log.Println(server.ListenAndServe())
+		}()
 	}
-
-	go func() {
-		log.Println(server.ListenAndServe())
-	}()
 
 	go StartX()
 
